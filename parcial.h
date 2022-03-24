@@ -1,3 +1,6 @@
+#ifndef __PARCIAL__
+#define __PARCIAL__
+
 #include <stdlib.h>
 
 /*
@@ -12,4 +15,6 @@ struct t_par_ordenado {
 /*
 Retorna k, que é o número mínimo de viagens necessárias.
 */
-double parcial(int qtdItens, double capacidade, double * pesos, t_par_ordenado * pares);
+double parcial(int qtdItens, double capacidade, double * pesos, int qtdPares, t_par_ordenado * pares);
+
+#endif

@@ -22,5 +22,9 @@ int main() {
         scanf("%d", &pares[i].depois);
     }
 
-    parcial(qtdItens, capacidade, pesos, pares);
+    double resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares);
+
+    printf("%lf\n", resultado);
+
+    return 0;
 }
