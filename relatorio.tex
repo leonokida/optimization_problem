@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Relatório - Etapa 1}
+\author{Laura Silva Lopes e Leon Augusto Okida Gonçalves}
+\date{Março 2022}
+
+\begin{document}
+
+\maketitle
+
+\section{Introdução}
+O problema a ser resolvido consiste em uma série de cargas que devem ser transportadas por uma empresa em seu único caminhão. Cada cargo tem seu respectivo peso, assim como o caminhão. A soma dos pesos das cargas em cada viagem não pode exceder o peso do caminhão e, provavelmente, serão feitas múltiplas viagens. Além disso, podem existir restrições de ordem entre as entregas de cada carga. Temos como objetivo calcular como fazer o menor número $K$ de viagens possível.\\
+Nessa primeira etapa, fizemos uma modelagem do problema para uma Programação Linear Relaxada, que nos dará uma solução aproximada do problema, sendo um número menor ou igual à solução inteira real.
+
+\newpage
+\section{Modelagem}
+A modelagem elaborada foi:
+\begin{eqnarray}
+    \mbox{min } \sum_{i=1}^n K_i\\
+    \mbox{s.a. }\sum_{j=1}^n w_j x_{ij} &\leq& C K_i \mbox{, } \forall i = 0, ..., n\\
+    \sum_{i=1}^n x_{ij} &=& 1 \mbox{, } \forall j = 0, ..., n\\
+    \sum_{i=1}^n i x_{ia} &<& \sum_{i=1}^n ix_{ib} \mbox{, } \forall (a, b)\\
+    K_i &\geq& K_{i+1} \mbox{, } \forall i = 0, ..., n\\
+    0 \leq &K_i& \leq 1 \mbox{, } \forall i = 0, ..., n\\
+    0 \leq &x_{ij}& \leq 1, \forall i, j = 0, ..., n
+\end{eqnarray}
+Onde:
+\begin{eqnarray*}
+    n &:& \mbox{número de cargas}\\
+    i &:& \mbox{índice de viagem}\\
+    j &:& \mbox{índice de carga}\\
+    K_i &:& \mbox{se viagem } i \mbox{ ocorre}\\
+    w_j &:& \mbox{peso da carga } j\\
+    x_{ij} &:& \mbox{se carga } j \mbox{ é transportada na viagem } i\\
+    C &:& \mbox{limite de peso máximo}
+\end{eqnarray*}
+
+\newpage
+\section{Explicação da modelagem}
+A função objetiva em $(1)$ busca minimizar o número $K$ de viagens feitas, que no pior caso é $n$ (uma viagem para transportar cada carga).\\
+A restrição em $(2)$ faz com que a soma dos pesos de cada carga $j$ que é transportada na viagem $i$ (se ela ocorre) não passe do limite $C$.\\
+A restrição em $(3)$ faz com que cada carga $j$ seja transportada uma única vez.\\
+A restrição em $(4)$ faz com que a viagem $i$ da carga $a$ tenha índice menor que a da carga $b$, o que faz com que ela seja transportada antes, em cada restrição de ordem $(a, b)$.\\
+A restrição em $(5)$ faz com que uma viagem $i$ ocorra apenas quando uma viagem de índice $i-1$ já tenha ocorrido antes.\\
+A restrição em $(6)$ serve para determinar que a variável $K_i$ seja binária, representando se a viagem $i$ ocorre ou não. Na modelagem elaborada, essa restrição foi relaxada.\\
+A restrição em $(7)$ serve para determinar que a variável $x_{ij}$ seja binária, representando se a carga $j$ é transportada na viagem $i$ ou não. Na modelagem elaborada, essa restrição foi relaxada.
+
+\newpage
+\section{Implementação}
+Para solucionar esse problema, foi desenvolvido um programa em C, com o uso da biblioteca LP Solve.\\
+O programa principal \texttt{parcial-relaxada} lê os dados de entrada e chama a função \texttt{parcial}, que está no arquivo de mesmo nome.\\
+A função \texttt{parcial} chama a função \texttt{escreveModelo}, que imprime a modelagem descrita no capítulo 2 no arquivo \texttt{entrada.lp}. Após isso, a biblioteca LP Solve é usada para resolver o modelo e obter a solução aproximada, que é retornada no fim da função.\\
+Por fim, o programa principal imprime o valor retornado por \texttt{parcial}.\\
+Para o programa funcionar adequadamente, é necessário configurar a variável de ambiente \texttt{LD\_LIBRARY\_PATH}, atribuindo a ela o endereço do diretório local. Assim, o programa consegue carregar a biblioteca LP Solve.
+\begin{enumerate}
+    \item[\$] \verb|LD\_LIBRARY\_PATH=. ./parcial-relaxada|
+\end{enumerate}
+
+\end{document}

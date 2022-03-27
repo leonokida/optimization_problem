@@ -17,5 +17,6 @@ parcial.o: parcial.c parcial.h
 
 purge: clean
 	-rm -f parcial-relaxada
+	-rm -f entrada.lp
 clean:
 	-rm -f $(objects)

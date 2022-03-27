@@ -24,7 +24,11 @@ int main() {
 
     double resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares);
 
-    printf("%lf\n", resultado);
+    printf("\e[1;1H\e[2J");
+    printf("O valor de K é: %lf\n", resultado);
 
+    free(pesos);
+    free(pares);
+    
     return 0;
 }
