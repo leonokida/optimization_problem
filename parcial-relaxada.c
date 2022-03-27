@@ -1,3 +1,5 @@
+//Laura e Leon
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "parcial.h"
@@ -10,6 +12,7 @@ int main() {
     scanf("%d", &qtdPares);
     scanf("%lf", &capacidade);
 
+    //Alocando vetores para pesos e pares ordenados
     double * pesos = (double *) calloc(qtdItens, sizeof(double));
     t_par_ordenado * pares = (t_par_ordenado *) calloc(qtdPares, sizeof(t_par_ordenado));
 
@@ -22,9 +25,10 @@ int main() {
         scanf("%d", &pares[i].depois);
     }
 
+    //Chama função parcial
     double resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares);
 
-    printf("\e[1;1H\e[2J");
+    printf("\e[1;1H\e[2J"); //Limpa tela
     printf("O valor de K é: %lf\n", resultado);
 
     free(pesos);

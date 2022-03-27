@@ -1,18 +1,25 @@
+//Laura e Leon
+
 #include "parcial.h"
 #include <stdio.h>
 
 #include "lp_lib.h"
 
+/*
+Escreve o modelo no arquivo entrada.lp
+*/
 void escreveModelo(int qtdItens, double capacidade, double * pesos, int qtdPares, t_par_ordenado * pares) {
     
     FILE* modelo = fopen("entrada.lp", "w");
 
+    //Imprime função objetiva
     fprintf(modelo, "min: ");
     int j;
     for (j = 1; j < qtdItens; j++)
       fprintf(modelo, "y%d+", j);
     fprintf(modelo, "y%d;\n", j);
 
+    //Imprime restrição de pesos
     int i;
     for (i=1; i<= qtdItens; i++) {
         for (j=1; j < qtdItens; j++)
@@ -20,13 +27,14 @@ void escreveModelo(int qtdItens, double capacidade, double * pesos, int qtdPares
         fprintf(modelo, "%lf*x%d%d <= %lf*y%d;\n", pesos[j-1], i, j, capacidade, i);
     }
 
+    //Imprime restrição de viagem única para cada item
     for (i=1; i<= qtdItens; i++) {
         for (j=1; j < qtdItens; j++)
             fprintf(modelo, "x%d%d+", j, i);
         fprintf(modelo, "x%d%d = 1;\n", j, i);
     }
 
-
+    //Imprime restrição de pares ordenados
     int k;
     for (k=0; k < qtdPares; k++) {
         for (i=1; i < qtdItens; i++)
@@ -37,6 +45,7 @@ void escreveModelo(int qtdItens, double capacidade, double * pesos, int qtdPares
         fprintf(modelo, "%d*x%d%d;\n", i, i, pares[k].antes);
     }
 
+    //Imprime restrições de valor das variáveis "binárias"
     for (i=1; i < qtdItens; i++) {
         fprintf(modelo, "y%d >= y%d;\n", i, i+1);
         fprintf(modelo, "y%d >= 0;\n", i);
@@ -62,7 +71,7 @@ double parcial(int qtdItens, double capacidade, double * pesos, int qtdPares, t_
 
     lprec *lp;
 
-    /* Read LP model */
+    /* Lendo modelo do arquivo */
     lp = read_LP("entrada.lp", NORMAL, "test model");
     if(lp == NULL) {
       fprintf(stderr, "Unable to read model\n");
@@ -71,8 +80,7 @@ double parcial(int qtdItens, double capacidade, double * pesos, int qtdPares, t_
 
     solve(lp);
 
-    /*set_outputfile(lp, "log.txt");
-    print_objective(lp);*/
-
-    return get_objective(lp);
+    double resultado = get_objective(lp);
+    delete_lp(lp);
+    return resultado;
 }

@@ -1,10 +1,12 @@
+//Laura e Leon
+
 #ifndef __PARCIAL__
 #define __PARCIAL__
 
 #include <stdlib.h>
 
 /*
-Struct que guarda os pares ordenados de restrição.
+Struct que guarda uma restrição de par ordenado.
 */
 typedef struct t_par_ordenado t_par_ordenado;
 struct t_par_ordenado {
