@@ -25,8 +25,16 @@ int main() {
         scanf("%d", &pares[i].depois);
     }
 
+    int l;
+    scanf("%d", &l);
+    t_parciais * parciais = (t_parciais *) calloc(l, sizeof(t_parciais));
+    for (int i = 0; i < l; i++) {
+        scanf("%d", &parciais[i].indice);
+        scanf("%d", &parciais[i].viagem);
+    }
+
     //Chama função parcial
-    double resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares);
+    double resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares, l, parciais);
 
     printf("\e[1;1H\e[2J"); //Limpa tela
     printf("O valor de K é: %lf\n", resultado);

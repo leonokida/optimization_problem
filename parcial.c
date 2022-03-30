@@ -8,7 +8,7 @@
 /*
 Escreve o modelo no arquivo entrada.lp
 */
-void escreveModelo(int qtdItens, double capacidade, double * pesos, int qtdPares, t_par_ordenado * pares) {
+void escreveModelo(int qtdItens, double capacidade, double * pesos, int qtdPares, t_par_ordenado * pares, int l, t_parciais * parciais) {
     
     FILE* modelo = fopen("entrada.lp", "w");
 
@@ -60,14 +60,19 @@ void escreveModelo(int qtdItens, double capacidade, double * pesos, int qtdPares
             fprintf(modelo, "x%d%d <= 1;\n", i, j);
         }
 
+    for (i=0; i < l; i++) {
+        int viagem = parciais[i].viagem;
+        fprintf(modelo, "%d*x%d%d = %d;\n", viagem, viagem, parciais[i].indice, viagem);
+    }
+
 
     fclose(modelo);
 
 }
 
-double parcial(int qtdItens, double capacidade, double * pesos, int qtdPares, t_par_ordenado * pares) {
+double parcial(int qtdItens, double capacidade, double * pesos, int qtdPares, t_par_ordenado * pares, int l, t_parciais * parciais) {
 
-    escreveModelo(qtdItens,capacidade,pesos, qtdPares, pares);
+    escreveModelo(qtdItens,capacidade,pesos, qtdPares, pares, l, parciais);
 
     lprec *lp;
 
@@ -78,9 +83,26 @@ double parcial(int qtdItens, double capacidade, double * pesos, int qtdPares, t_
       return(1);
     }
 
-    solve(lp);
-
-    double resultado = get_objective(lp);
-    delete_lp(lp);
-    return resultado;
+    int solucao = solve(lp);
+    double resultado;
+    switch(solucao){
+        case 0:
+        case 1:
+            resultado = get_objective(lp);
+            delete_lp(lp);
+            return resultado;
+            break;
+        case 2:
+            printf("Problema inviável.\n");
+            exit(1);
+            break;
+        case 3:
+            printf("Problema ilimitado.\n");
+            exit(1);
+            break;
+        default:
+            printf("Algum erro ocorreu.\n");
+            exit(1);
+            break;
+    }
 }
