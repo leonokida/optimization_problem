@@ -41,6 +41,7 @@ int main() {
 
     free(pesos);
     free(pares);
+    free(parciais);
     
     return 0;
 }
