@@ -36,7 +36,7 @@ int main() {
     //Chama função parcial
     double resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares, l, parciais);
 
-    printf("\e[1;1H\e[2J"); //Limpa tela
+    //printf("\e[1;1H\e[2J"); //Limpa tela
     printf("O valor de K é: %lf\n", resultado);
 
     free(pesos);

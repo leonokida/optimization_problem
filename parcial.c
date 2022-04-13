@@ -88,21 +88,22 @@ double parcial(int qtdItens, double capacidade, double * pesos, int qtdPares, t_
     switch(solucao){
         case 0:
         case 1:
+            print_solution(lp, 1);
             resultado = get_objective(lp);
             delete_lp(lp);
             return resultado;
             break;
         case 2:
             printf("Problema inviável.\n");
-            exit(1);
+            return -1;
             break;
         case 3:
             printf("Problema ilimitado.\n");
-            exit(1);
+            return -1;
             break;
         default:
             printf("Algum erro ocorreu.\n");
-            exit(1);
+            return -1;
             break;
     }
 }
