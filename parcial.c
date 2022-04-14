@@ -88,9 +88,10 @@ double parcial(int qtdItens, double capacidade, double * pesos, int qtdPares, t_
     switch(solucao){
         case 0:
         case 1:
-            print_solution(lp, 1);
             resultado = get_objective(lp);
             delete_lp(lp);
+            //print_solution(lp, 1);
+            //printf("RESULTADO PARCIAL: %lf\n", resultado);
             return resultado;
             break;
         case 2:

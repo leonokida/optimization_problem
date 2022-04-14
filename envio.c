@@ -3,41 +3,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "parcial.h"
+#include "math.h"
 
+double opt;
+t_parciais * resposta;
 
+void copia(t_parciais * parciais, int qtdItens) {
+	for (int i = 0; i < qtdItens; i++) {
+		resposta[i].indice = parciais[i].indice;
+		resposta[i].viagem = parciais[i].viagem;
+	}
+}
 
-void resolucao(int qtdItens, double capacidade, double * pesos, int qtdPares, t_par_ordenado * pares, t_parciais * parciais, int itemIndice, int l, double * opt) {
+void resolucao(int qtdItens, double capacidade, double * pesos, int qtdPares, t_par_ordenado * pares, t_parciais * parciais, int itemIndice, int l, double custo) {
 
-    if (itemIndice > qtdItens) {        
+    if (itemIndice > qtdItens) {
+        if (custo < opt) {
+            opt = custo;
+            copia(parciais, qtdItens);
+        }
+
         return;
     }
 
-    parciais[l-1].indice = itemIndice;
+    parciais[l].indice = itemIndice;
     double resultado;
-/*
-    double resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares, l, parciais);
-    if ((resultado > 0) && (resultado < *opt)) {
-        *opt = resultado;
-        for (int i = 2; i <= qtdItens; i++) {
-            resolucao(qtdItens, capacidade, pesos, qtdPares, pares, parciais, itemIndice, i, opt);
-        }
-    }*/
     for (int i = 1; i <= qtdItens; i++) {
-        parciais[l-1].viagem = i;
-        resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares, l, parciais);
-        if ((resultado > 0) && (resultado < *opt)) {
-            *opt = resultado;
-            l++;
-            resolucao(qtdItens, capacidade, pesos, qtdPares, pares, parciais, itemIndice+1, l, opt);
+        parciais[l].viagem = i;
+        resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares, l+1, parciais);
+        if ((resultado > 0) && (resultado < opt)) {
+            resolucao(qtdItens, capacidade, pesos, qtdPares, pares, parciais, itemIndice+1, l+1, resultado);
         }
     }
-
 }
 
-void imprime(double * opt, int qtdItens, t_parciais * parciais) {
-    printf("%lf\n", *opt);
-    for (int i = 0; i < qtdItens; i++)
-        printf("%d: %d\n", parciais[i].indice, parciais[i].viagem);
+void imprime(int qtdItens) {
+    printf("\e[1;1H\e[2J"); //Limpa tela
+
+    //TODO calcular numero de viagens
+    printf("%lf\n", opt);
+    for (int i = 0; i < qtdItens; i++) {
+        //printf("%d: %d\n", resposta[i].indice, resposta[i].viagem);
+        printf("%d\n", resposta[i].viagem);
+    }
 }
 
 int main() {
@@ -61,20 +69,18 @@ int main() {
         scanf("%d", &pares[i].depois);
     }
 
+    opt = qtdItens;
+
     t_parciais * parciais = (t_parciais *) calloc(qtdItens, sizeof(t_parciais));
-    double opt = qtdItens;
-    int l = 1;
-    resolucao(qtdItens, capacidade, pesos, qtdPares, pares, parciais, 1, l, &opt);
-    imprime(&opt, qtdItens, parciais);
-
-    //Chama função parcial
-    //double resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares, l, parciais);
-
-    //printf("\e[1;1H\e[2J"); //Limpa tela
-    //printf("O valor de K é: %lf\n", resultado);
+    resposta = (t_parciais *) calloc(qtdItens, sizeof(t_parciais));
+    int l = 0;
+    resolucao(qtdItens, capacidade, pesos, qtdPares, pares, parciais, 1, l, qtdItens);
+    imprime(qtdItens);
 
     free(pesos);
     free(pares);
-    
+    free(parciais);
+    free(resposta);
+
     return 0;
 }
