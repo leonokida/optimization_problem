@@ -3,7 +3,7 @@
 #gcc parcial-relaxada.c parcial.c -lm -ldl -o parcial-relaxada liblpsolve55.so
 
 
-CFLAGS = -Wall -lm -ldl liblpsolve55.so
+CFLAGS = -Wall -g -lm -ldl liblpsolve55.so
 
 objects = parcial.o
 
@@ -21,5 +21,6 @@ envio: envio.c $(objects)
 purge: clean
 	-rm -f parcial-relaxada envio
 	-rm -f entrada.lp
+	-rm -f log.txt
 clean:
 	-rm -f $(objects)

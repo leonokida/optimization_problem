@@ -83,6 +83,7 @@ double parcial(int qtdItens, double capacidade, double * pesos, int qtdPares, t_
       return(1);
     }
 
+    set_outputfile(lp, "log.txt");
     int solucao = solve(lp);
     double resultado;
     switch(solucao){

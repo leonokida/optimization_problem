@@ -5,8 +5,16 @@
 #include "parcial.h"
 #include "math.h"
 
-double opt;
+int opt;
 t_parciais * resposta;
+
+int maxViagem(t_parciais * parciais, int qtdItens) {
+    int max = 0;
+    for (int i = 0; i < qtdItens; i++)
+        if (parciais[i].viagem > max)
+            max = parciais[i].viagem;
+    return max;
+}
 
 void copia(t_parciais * parciais, int qtdItens) {
 	for (int i = 0; i < qtdItens; i++) {
@@ -61,9 +69,10 @@ int verificaCiclos(int qtdPares, t_par_ordenado * pares) {
 
 void resolucao(int qtdItens, double capacidade, double * pesos, int qtdPares, t_par_ordenado * pares, t_parciais * parciais, int l, int * ordemItens, int itemIndice, double custo) {
 
-    if (l > qtdItens) {
-        if (custo < opt) {
-            opt = custo;
+    if (l >= qtdItens) {
+        int max = maxViagem(parciais, qtdItens);
+        if (max < opt) {
+            opt = max;
             copia(parciais, qtdItens);
         }
         return;
@@ -97,7 +106,7 @@ void imprime(int qtdItens) {
     printf("\e[1;1H\e[2J"); //Limpa tela
 
     //TODO calcular numero de viagens
-    printf("%lf\n", opt);
+    printf("%d\n", opt);
     for (int i = 0; i < qtdItens; i++) {
         //printf("%d: %d\n", resposta[i].indice, resposta[i].viagem);
         printf("%d\n", resposta[i].viagem);
