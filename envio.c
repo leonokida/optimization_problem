@@ -6,6 +6,7 @@
 #include "math.h"
 
 int opt;
+double limitante;
 t_parciais * resposta;
 
 int maxViagem(t_parciais * parciais, int qtdItens) {
@@ -32,7 +33,6 @@ int verificaPeso(double * pesos, t_parciais * parciais, double capacidade, int v
         }
     }
 
-    printf("Soma do peso da viagem %d com o item %d: %d / %lf.\n", viagem, i, soma, capacidade);
     if (soma > capacidade)
         return 0;
 
@@ -45,7 +45,6 @@ int verificaOrdem(int qtdPares, t_par_ordenado * pares, int l, t_parciais * parc
         if (pares[i].depois == itemIndice) {
             for (int j = 0; j < l; j++) {
                 if ((parciais[j].indice == pares[i].antes) && (parciais[j].viagem >= viagem)){
-                    printf("Item %d não pode ir antes de %d\n", itemIndice, parciais[j].indice);
                     return 0;
                 }
             }
@@ -58,7 +57,7 @@ int verificaCiclos(int qtdPares, t_par_ordenado * pares) {
 
     for (int i = 0; i < qtdPares; i++) {
         for (int j = i+1; j < qtdPares; j++) {
-            if ((pares[i].antes == pares[j].depois) && (pares[i].depois == pares[j].antes)){
+            if ((pares[i].antes == pares[j].depois) && (pares[i].depois == pares[j].antes)) {
                 return 0;
             }
         }
@@ -84,7 +83,12 @@ void resolucao(int qtdItens, double capacidade, double * pesos, int qtdPares, t_
         parciais[l].viagem = i;
 
         if (verificaPeso(pesos, parciais, capacidade, i, l+1) && verificaOrdem(qtdPares, pares, l+1, parciais, ordemItens[itemIndice], i)){
+            /*
+            Descomentar a linha abaixo fará com que a solução do LP Solve seja usada como bound.
             resultado = parcial(qtdItens, capacidade, pesos, qtdPares, pares, l+1, parciais);
+            */
+            
+            resultado = limitante;
             if ((resultado > 0) && (resultado < opt)) {
                 resolucao(qtdItens, capacidade, pesos, qtdPares, pares, parciais, l+1, ordemItens, itemIndice+1, resultado);
             }
@@ -102,8 +106,30 @@ int buscaItem(int * ordemItens, int qtdItens, int k) {
     return 0;
 }
 
+void troca(int a, int b) {
+    t_parciais temp;
+    temp.indice = resposta[a].indice;
+    temp.viagem = resposta[a].viagem;
+    resposta[a].indice = resposta[b].indice;
+    resposta[a].viagem = resposta[b].viagem;
+    resposta[b].indice = temp.indice;
+    resposta[b].viagem = temp.viagem;
+}
+
+void ordenar(int qtdItens) {
+    int i = 1;
+    while (i < qtdItens) {
+        int j = i;
+        while ((j > 0) && (resposta[j-1].indice > resposta[j].indice)) {
+            troca(j-1, j);
+            j = j-1;
+        }
+        i++;
+    }
+}
+
 void imprime(int qtdItens) {
-    printf("\e[1;1H\e[2J"); //Limpa tela
+    ordenar(qtdItens); // Ordena vetor de respostas
 
     //TODO calcular numero de viagens
     printf("%d\n", opt);
@@ -125,9 +151,18 @@ int main() {
     double * pesos = (double *) calloc(qtdItens, sizeof(double));
     t_par_ordenado * pares = (t_par_ordenado *) calloc(qtdPares, sizeof(t_par_ordenado));
 
+    limitante = 0;
     for (int i = 0; i < qtdItens; i++) {
         scanf("%lf", &pesos[i]);
+        if (pesos[i] > capacidade) {
+            printf("Peso maior que a capacidade máxima.\n");
+            free(pesos);
+            free(pares);
+            return 0;
+        }
+        limitante+=pesos[i];
     }
+    limitante = limitante / capacidade;
 
     for (int i = 0; i < qtdPares; i++) {
         scanf("%d", &pares[i].antes);
