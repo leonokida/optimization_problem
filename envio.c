@@ -171,20 +171,23 @@ int main() {
 
     int * ordemItens = (int *) calloc(qtdItens, sizeof(int));
     int i;
+    int j = 0;
     for (i = 0; i < qtdPares; i++) {
-        ordemItens[i] = pares[i].antes;
-    }
-
-    for (int k = 1 ; k <= qtdItens; k++) {
-        if (!buscaItem(ordemItens, qtdItens, k)) {
-            ordemItens[i] = k;
-            i++;
+        if (!buscaItem(ordemItens, j, pares[i].antes)) {
+            ordemItens[j] = pares[i].antes;
+            j++;
         }
     }
-
+    for (int k = 1 ; k <= qtdItens; k++) {
+        if (!buscaItem(ordemItens, qtdItens, k)) {
+            ordemItens[j] = k;
+            j++;
+        }
+    }
+    
     if(verificaCiclos(qtdPares, pares)){
 
-        opt = qtdItens;
+        opt = qtdItens+1;
 
         t_parciais * parciais = (t_parciais *) calloc(qtdItens, sizeof(t_parciais));
         resposta = (t_parciais *) calloc(qtdItens, sizeof(t_parciais));
