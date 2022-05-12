@@ -1,9 +1,9 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
-\title{Relatório - Etapa 1}
+\title{Relatório - Etapa 2}
 \author{Laura Silva Lopes e Leon Augusto Okida Gonçalves}
-\date{Março 2022}
+\date{Abril 2022}
 
 \begin{document}
 
@@ -11,10 +11,11 @@
 
 \section{Introdução}
 O problema a ser resolvido consiste em uma série de cargas que devem ser transportadas por uma empresa em seu único caminhão. Cada carga tem seu respectivo peso, assim como o caminhão. A soma dos pesos das cargas em cada viagem não pode exceder o peso do caminhão e, por isso, provavelmente terão que ser feitas múltiplas viagens. Além disso, podem existir restrições de ordem entre as entregas de cada carga. Temos como objetivo calcular como fazer o menor número $K$ de viagens possível.\\
-Nessa primeira etapa, fizemos uma modelagem do problema para uma Programação Linear Relaxada, que nos dará uma solução aproximada do problema, sendo um número menor ou igual à solução inteira real.
+Na primeira etapa, fizemos uma modelagem do problema para uma Programação Linear Relaxada, que nos dá uma solução aproximada do problema, sendo um número menor ou igual à solução inteira real. \\
+Para a segunda etapa do trabalho, utilizamos essa modelagem para obter soluções parciais de subproblemas e usá-las para resolver o problema com a técnica de \textit{branch and bound}. \\
 
 \newpage
-\section{Modelagem}
+\section{Modelagem da solução parcial} \label{modelagem}
 A modelagem elaborada foi:
 \begin{eqnarray}
     \mbox{min } \sum_{i=1}^n K_i\\
@@ -41,7 +42,7 @@ Onde:
 \end{eqnarray*}
 
 \newpage
-\section{Explicação da modelagem}
+\section{Explicação da modelagem da solução parcial}
 A função objetiva em $(1)$ busca minimizar o número $K$ de viagens feitas, que no pior caso é $n$ (uma viagem para transportar cada carga).\\
 A restrição em $(2)$ faz com que a soma dos pesos de cada carga $j$ que é transportada na viagem $i$ (se ela ocorre) não passe do limite $C$.\\
 A restrição em $(3)$ faz com que cada carga $j$ seja transportada uma única vez.\\
@@ -53,30 +54,44 @@ A restrição em $(8)$ serve para fixar uma solução parcial já encontrada, fa
 
 \newpage
 \section{Implementação}
-Para solucionar esse problema, foi desenvolvido um programa em C, com o uso da biblioteca LP Solve.\\
-O programa principal \texttt{parcial-relaxada} lê os dados de entrada e chama a função \texttt{parcial}, que está no arquivo de mesmo nome.\\
-A função \texttt{parcial} chama a função \texttt{escreveModelo}, que imprime a modelagem descrita no capítulo 2 no arquivo \texttt{entrada.lp}. Após isso, a biblioteca LP Solve é usada para resolver o modelo e obter a solução aproximada, que é retornada no fim da função.\\
-Por fim, o programa principal imprime o valor retornado por \texttt{parcial}.\\
-Para o programa funcionar adequadamente, é necessário configurar a variável de ambiente \texttt{LD\_LIBRARY\_PATH}, atribuindo a ela o endereço do diretório local. Assim, o programa consegue carregar a biblioteca LP Solve.
-\begin{enumerate}
-    \item[\$] \verb|LD\_LIBRARY\_PATH=. ./parcial-relaxada|
-\end{enumerate}
+Para solucionar o problema, foi desenvolvido um programa em C, com o uso da biblioteca LP Solve.\\
+O programa principal \texttt{envio} lê os dados de entrada e ordena as cargas a serem transportadas de acordo com as restrições de ordem, isto é, as cargas que devem vir antes de outras são processadas primeiro.\\
+Se as restrições não formarem um ciclo, é chamada a função \texttt{resolucao} que retornará o número inteiro mínimo de viagens necessárias para transportar todas as cargas.\\
+Para cada carga $j$ e viagem $i$, é verificado se, transportando a carga na viagem, o peso do caminhão não ultrapassa a capacidade máxima e se não infringe alguma restrição de ordem de entrega. Sendo possível o transporte, é calculada a função limitante, descrita na Seção \ref{parcial}, fixando a carga $j$ à viagem $i$.\\
+Se o valor retornado pela função limitante for melhor que a solução ótima até então encontrada, então a função \texttt{resolucao} é chamada recursivamente para as demais cargas. No momento em que todas as cargas são designadas a uma viagem, e, caso o número de viagens realizadas for menor que a solução ótima, então a variável \texttt{opt}, que representa a solução ótima e que é usada de limitante para as demais ramificações do algoritmo, é atualizada, recebendo o número de viagens realizadas.\\
+Por fim, o programa principal imprime o valor da solução ótima e a viagem em que cada carga foi transportada.\\
+
+\subsection{Função limitante} \label{parcial}
+A função \texttt{parcial} recebe como parâmetro todos os dados de entrada e o conjunto das soluções parciais $P$. Essa função chama \texttt{escreveModelo}, que imprime a modelagem descrita no Capítulo \ref{modelagem} no arquivo \texttt{entrada.lp}. Após isso, a biblioteca LP Solve é usada para resolver o modelo e obter a solução aproximada, que é retornada no fim da função. Essa função foi desenvolvida na primeira etapa do trabalho.\\
+Notamos que a solução aproximada obtida é sempre $(\sum_{j=1}^n w_j)/C$, ou seja, a soma dos pesos $w$ de todas as cargas $j$ dividido pela capacidade máxima $C$ do caminhão. Por isso, utilizamos este cálculo como função limitante no algoritmo principal, ao invés de usarmos a solução parcial relaxada.\\
+Como para a segunda abordagem não há leitura e escrita em arquivos, naturalmente a solução, para problemas pequenos o suficiente, é encontrada mais rapidamente do que utilizando a função \texttt{parcial}. Entretanto, para os testes realizados, os dois métodos retornam o mesmo resultado.\\
+Optamos pela função $(\sum_{j=1}^n w_j)/C$ como limitante, conforme combinado em sala de aula.
 
 \newpage
-\section{Exemplo de entrada}
+\section{Execução}
+
+Para o programa funcionar adequadamente, é necessário configurar a variável de ambiente \texttt{LD\_LIBRARY\_PATH}, atribuindo a ela o endereço do diretório local. Assim, o programa consegue carregar a biblioteca LP Solve.
+\begin{enumerate}
+    \item[\$] \verb|LD\_LIBRARY\_PATH=. ./envio|
+\end{enumerate}
+
 Considere a entrada abaixo:\\
     5\mbox{ }2\mbox{ }10\\
     5\mbox{ }6\mbox{ }4\mbox{ }8\mbox{ }5\\
     2\mbox{ }3\\
     5\mbox{ }1\\
-    2\\
-    3\mbox{ }2\\
-    5\mbox{ }3\\
+\\    
 Na primeira linha, são informados o número de cargas, de restrições de ordem e o peso máximo suportado.\\
 Na segunda linha, são informados os pesos das cargas.\\
 Nas terceira e quarta linhas, são informados os pares de restrições, seguindo a ordem $(a, b)$.\\
-Na quinta linha, é informado o valor de $l$.\\
-Nas sexta e sétima linhas, são informados o índice da carga $y$ em $P$ e seu respectivo $v(y)$.\\
-As entradas suportadas pelo programa seguem esse padrão.
+As entradas suportadas pelo programa seguem esse padrão.\\
+\\
+A saída esperada para esse exemplo é:\\
+4\\
+3\\
+1\\
+2\\
+4\\
+2\\
 
 \end{document}
